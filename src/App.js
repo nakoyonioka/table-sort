@@ -13,7 +13,11 @@ const fetchData = () => {
 
 function App() {
   const [users, setUsers] = useState([{}]);
-  const [order, setOrders] = useState(true); //if false then desc, else asc
+  const [order, setOrders] = useState({
+    first: false,
+    last: false,
+    city: false,
+  }); //if false then desc, else asc
 
   useEffect(() => {
     setUsers([{}]);
@@ -25,19 +29,30 @@ function App() {
   }, []);
 
   function sortHandler(e) {
-    setOrders((prev) => !prev);
     const sortingValue1 = e.target.getAttribute("data");
     const sortingValue2 = e.target.getAttribute("data-second");
     const obj = [...users];
+    setOrders((prev) => ({
+      ...prev,
+      [sortingValue2]: !prev[sortingValue2],
+    }));
 
     obj.sort((a, b) => {
       if (a.name !== undefined && b.name !== undefined) {
-        if (!order) {
-          if (a[sortingValue1][sortingValue2] > b[sortingValue1][sortingValue2])
+        if (!order[sortingValue2]) {
+          if (
+            a[sortingValue1][sortingValue2] > b[sortingValue1][sortingValue2]
+          ) {
+            e.target.innerText = "▲";
             return 1;
-        } else if (order) {
-          if (a[sortingValue1][sortingValue2] < b[sortingValue1][sortingValue2])
+          }
+        } else if (order[sortingValue2]) {
+          if (
+            a[sortingValue1][sortingValue2] < b[sortingValue1][sortingValue2]
+          ) {
+            e.target.innerText = "▼";
             return 1;
+          }
         } else return -1;
       }
       return -1;
