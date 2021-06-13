@@ -13,11 +13,13 @@ const fetchData = () => {
 
 function App() {
   const [users, setUsers] = useState([{}]);
+  const [forFilter, setForFilter] = useState([{}]);
   const [order, setOrders] = useState({
     first: false,
     last: false,
     city: false,
   }); //if false then desc, else asc
+  const [filtering, setFiltering] = useState(false);
 
   useEffect(() => {
     setUsers([{}]);
@@ -61,8 +63,34 @@ function App() {
     setUsers(obj);
   }
 
+  function filterData(e) {
+    if (e.target.value !== "") {
+      setFiltering(true);
+      setForFilter(users);
+      displayFilteredData(e);
+    } else {
+      setFiltering(false);
+    }
+  }
+
+  function displayFilteredData(e) {
+    if (e.target.value.match(/^[0-9a-z]+$/)) {
+      let re = new RegExp(e.target.value);
+      setForFilter((prev) =>
+        prev.filter(
+          (item) =>
+            item.name !== undefined &&
+            (re.test(item.name.first.toLowerCase()) ||
+              re.test(item.name.last.toLowerCase()) ||
+              re.test(item.location.city.toLowerCase()))
+        )
+      );
+    }
+  }
+
   return (
-    <div className="App">
+    <div className="container">
+      <input type="text" onChange={filterData} placeholder="Search" />
       <table width="100%">
         <thead>
           <tr>
@@ -87,15 +115,25 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {users.map((user, index) =>
-            user.name !== undefined ? (
-              <tr key={index}>
-                <td>{user.name.first}</td>
-                <td>{user.name.last}</td>
-                <td>{user.location.city}</td>
-              </tr>
-            ) : null
-          )}
+          {!filtering
+            ? users.map((user, index) =>
+                user.name !== undefined ? (
+                  <tr key={index}>
+                    <td>{user.name.first}</td>
+                    <td>{user.name.last}</td>
+                    <td>{user.location.city}</td>
+                  </tr>
+                ) : null
+              )
+            : forFilter.map((user, index) =>
+                user.name !== undefined ? (
+                  <tr key={index}>
+                    <td>{user.name.first}</td>
+                    <td>{user.name.last}</td>
+                    <td>{user.location.city}</td>
+                  </tr>
+                ) : null
+              )}
         </tbody>
       </table>
     </div>
